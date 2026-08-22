@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Magazine for Bestie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,500;1,700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-outside: #fce4ec; 
+            --mag-bg: #fffbfb; 
+            --text-dark: #5c4044; 
+            --accent-color: #f8bbd0; 
+            --shadow-pink: rgba(248, 187, 208, 0.5);
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-outside);
+            background-image: radial-gradient(var(--accent-color) 1.5px, transparent 1.5px);
+            background-size: 25px 25px;
+            font-family: 'Amiri', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #music-btn {
+            position: fixed; top: 25px; left: 25px; z-index: 1000;
+            background: rgba(255, 255, 255, 0.95); border: none; padding: 12px 24px;
+            border-radius: 30px; cursor: pointer; font-family: 'Playfair Display', serif; font-weight: 600;
+            font-size: 16px; color: var(--text-dark); box-shadow: 0 5px 15px var(--shadow-pink); 
+            transition: all 0.3s ease;
+        }
+        #music-btn:hover { background: var(--accent-color); color: #fff; transform: translateY(-3px); }
+
+        .magazine-wrapper {
+            position: relative; z-index: 10; width: 95vw; max-width: 1200px; 
+            height: 88vh; 
+            perspective: 2500px; display: flex; justify-content: center; align-items: center;
+        }
+
+        .spine {
+            position: absolute; left: 50%; top: 0; bottom: 0; width: 50px;
+            background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(200, 150, 160, 0.2) 50%, rgba(0,0,0,0) 100%);
+            transform: translateX(-50%); z-index: 100; pointer-events: none;
+        }
+
+        .page {
+            position: absolute; width: 50%; height: 100%; top: 0; right: 0; 
+            background: var(--mag-bg); box-shadow: inset 0 0 30px rgba(248, 187, 208, 0.1), 0 5px 15px rgba(0,0,0,0.05);
+            border-radius: 8px; transform-origin: left center; transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1); z-index: 1; 
+        }
+        
+        .page.left-side { right: 50%; transform-origin: right center; border-radius: 8px 0 0 8px; }
+
+        .front, .back {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            backface-visibility: hidden; display: flex; justify-content: space-between;
+            padding: 40px; box-sizing: border-box; background: var(--mag-bg); border-radius: inherit; overflow: hidden;
+        }
+
+        .back { transform: rotateY(180deg); }
+        .page.flipped { transform: rotateY(-180deg); }
+
+        .page-half {
+            width: 48%; height: 100%; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; position: relative; box-sizing: border-box;
+        }
+
+        .scrap-img {
+            border: 10px solid white;
+            border-bottom: 35px solid white; 
+            box-shadow: 2px 8px 20px var(--shadow-pink);
+            object-fit: cover; background-color: #fce4ec; z-index: 5;
+            transform: rotate(var(--rot, 0deg)); transition: transform 0.3s ease, z-index 0.3s ease;
+        }
+        .scrap-img:hover { transform: scale(1.08) rotate(0deg) !important; z-index: 50; box-shadow: 4px 12px 25px rgba(248, 187, 208, 0.8); }
+        
+        .img-portrait { width: 300px; height: 400px; max-width: 90%; } 
+        .img-square { width: 320px; height: 320px; max-width: 90%; }
+        .img-landscape { width: 350px; height: 260px; max-width: 95%; }
+
+        .aesthetic-text { 
+            font-family: 'Playfair Display', serif; font-style: italic; 
+            color: #e6a8b8; z-index: 2; line-height: 1.1; text-align: center;
+        }
+        
+        .ar-title { 
+            font-family: 'Amiri', serif; font-size: 2.1rem; color: var(--text-dark); 
+            font-weight: bold; margin-bottom: 12px; text-align: center;
+        }
+        
+        .ar-text { 
+            font-size: 1.15rem; line-height: 1.9; color: #5a4548; 
+            background: rgba(255, 251, 251, 0.95); padding: 20px; 
+            border-right: 4px solid var(--accent-color); max-width: 95%; 
+            box-shadow: 0 5px 15px var(--shadow-pink); border-radius: 4px; text-align: right;
+        }
+
+        .nav-btn {
+            position: absolute; bottom: 25px; background: rgba(252, 228, 236, 0.9); 
+            border: 1px solid var(--accent-color); font-family: 'Playfair Display', serif; 
+            font-size: 1.1rem; cursor: pointer; border-radius: 20px; padding: 6px 16px;
+            color: var(--text-dark); transition: all 0.3s; z-index: 200; font-weight: 600;
+        }
+        .nav-btn:hover { background: var(--accent-color); color: #fff; box-shadow: 0 4px 10px var(--shadow-pink);}
+        
+        .btn-next { right: 30px; }
+        .btn-prev { left: 30px; } 
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop><source src="sound.mp4.mp4" type="audio/mpeg"></audio>
+    <button id="music-btn" onclick="toggleMusic()">🎵 Play Music</button>
+
+    <div class="magazine-wrapper" id="book">
+        <div class="spine"></div>
+
+        <!-- الورقة 5 (الخاتمة) -->
+        <div class="page" id="page5" style="z-index: 1;">
+            <div class="front">
+                <div class="page-half">
+                    <img src="pic9.jpeg" class="scrap-img img-portrait" style="--rot: -2deg;" alt="صورة 9">
+                    <div class="aesthetic-text" style="font-size: 2.2rem; margin-top: 15px;">Forever & Always ♾️</div>
+                </div>
+                <div class="page-half">
+                    <div class="ar-title">نعمة مابتخلصش </div>
+                    <div class="ar-text">كل اللي بتمناه إن ربنا يحفظك ليا ويديمك نعمة مابتخلصش. تفضلي دايماً صاحبتي وأختي العمر كله. عايزة الأيام تفوت وإحنا لسه بنهزر وبنضحك من قلبنا زي دلوقتي.. بحبك أوي يا أغلى الناس، ومهما قلت كلام مش هيوفي حقك عندي.</div>
+                </div>
+                <button class="nav-btn btn-prev" onclick="turnPage(4, false)">🡄 Previous</button>
+                <button class="nav-btn btn-next" onclick="turnPage(5, true)">Finish ➔</button>
+            </div>
+            <div class="back">
+                <div class="page-half">
+                    <img src="pic10.jpeg" class="scrap-img img-square" style="--rot: 5deg; border-radius: 50%; border-bottom: 10px solid white;" alt="صورة 10">
+                </div>
+                <div class="page-half">
+                    <div class="aesthetic-text" style="font-size: 2.5rem; color: var(--text-dark);">Love You Endlessly ❤️</div>
+                    <button class="nav-btn btn-prev" onclick="turnPage(5, false)">🡄 Previous</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- الورقة 4 (السند) -->
+        <div class="page" id="page4" style="z-index: 2;">
+            <div class="front">
+                <div class="page-half">
+                    <img src="pic7.jpeg" class="scrap-img img-landscape" style="--rot: 3deg;" alt="صورة 7">
+                    <div class="aesthetic-text" style="font-size: 2.2rem; margin-top: 15px;">Through Thick & Thin 🫂</div>
+                </div>
+                <div class="page-half">
+                    <div class="ar-title">أماني وسندي ❤️</div>
+                    <div class="ar-text">لما الدنيا بتقفل في وشي مبفكرش اكلم حد غيرك، عارفة انك هتسمعيني من غير ماتحكمي وتطبطبي عليا. وقفتك معايا في الحلو والوحش دي بتخليني اطمن ان مهما حصل انتي هنا.</div>
+                </div>
+                <button class="nav-btn btn-prev" onclick="turnPage(3, false)">🡄 Previous</button>
+                <button class="nav-btn btn-next" onclick="turnPage(4, true)">Next ➔</button>
+            </div>
+            <div class="back">
+                <div class="page-half">
+                    <img src="pic8.jpeg" class="scrap-img img-portrait" style="--rot: -4deg;" alt="صورة 8">
+                </div>
+                <div class="page-half">
+                    <div class="aesthetic-text" style="font-size: 2.2rem;">My Safe Haven 🏡</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الورقة 3 (النجاح) -->
+        <div class="page" id="page3" style="z-index: 3;">
+            <div class="front">
+                <div class="page-half">
+                    <img src="pic5.jpeg" class="scrap-img img-portrait" style="--rot: -3deg;" alt="صورة 5">
+                    <div class="aesthetic-text" style="font-size: 2.2rem; margin-top: 15px;">Growing Together 🌟</div>
+                </div>
+                <div class="page-half">
+                    <div class="ar-title">شركاء النجاح 🌟</div>
+                    <div class="ar-text">معاكي مفيش حاجة صعبة، بنشجع بعض ونقوم بعض لو وقعنا. والنجاح مبيحلاش غير وإحنا بنحتفل بيه مع بعض. فخورة بيكي وبكل خطوة بنخطيها سوا، ويا رب دايماً نشوف بعض في أحسن الأماكن ونفضل في ضهر بعض بنسند وبنزق لقدام.</div>
+                </div>
+                <button class="nav-btn btn-prev" onclick="turnPage(2, false)">🡄 Previous</button>
+                <button class="nav-btn btn-next" onclick="turnPage(3, true)">Next ➔</button>
+            </div>
+            <div class="back">
+                <div class="page-half">
+                    <img src="pic6.jpeg" class="scrap-img img-landscape" style="--rot: 4deg;" alt="صورة 6">
+                </div>
+                <div class="page-half">
+                    <div class="aesthetic-text" style="font-size: 2.2rem;">So Proud Of Us 🎓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الورقة 2 (الضحك والتفاهم) -->
+        <div class="page" id="page2" style="z-index: 4;">
+            <div class="front">
+                <div class="page-half">
+                    <img src="pic3.jpeg" class="scrap-img img-square" style="--rot: -5deg;" alt="صورة 3">
+                    <div class="aesthetic-text" style="font-size: 2.2rem; margin-top: 15px;">Unspoken Bond ✨</div>
+                </div>
+                <div class="page-half">
+                    <div class="ar-title">فاهماني من سكات 👯‍♀️</div>
+                    <div class="ar-text">إحساس إن فيه حد فاهم دماغك وحاسس بيكي من غير مجهود ده ميتوصفش. إنتي بتقري أفكاري قبل ما أتكلم، أنا بجد بنسى الدنيا كلها وإحنا بنضحك سوا. ضحكتنا على حاجات محدش بيفهمها غيرنا دي بتغسلني من جوه. بجد ربنا ميحرمني من ضحكتك دي أبدًا.</div>
+                </div>
+                <button class="nav-btn btn-prev" onclick="turnPage(1, false)">🡄 Previous</button>
+                <button class="nav-btn btn-next" onclick="turnPage(2, true)">Next ➔</button>
+            </div>
+            <div class="back">
+                <div class="page-half">
+                    <img src="pic4.jpeg" class="scrap-img img-portrait" style="--rot: 3deg;" alt="صورة 4">
+                </div>
+                <div class="page-half">
+                    <div class="aesthetic-text" style="font-size: 2.2rem;">Endless Laughs ✨</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الورقة 1 (الغلاف) -->
+        <div class="page" id="page1" style="z-index: 5;">
+            <div class="front">
+                <div class="page-half">
+                    <img src="pic1.jpeg" class="scrap-img img-portrait" style="--rot: -4deg;" alt="صورة 1">
+                    <div class="aesthetic-text" style="font-size: 2.2rem; margin-top: 15px;">For My Soulmate 🤍</div>
+                </div>
+                <div class="page-half">
+                    <div class="ar-title">عشان إنتي مش أي حد 🎀</div>
+                    <div class="ar-text">بما إنك مش مجرد صاحبة، كان لازم أعملك حاجة مخصوصة ليكي إنتي بس. افتحي يلا.</div>
+                </div>
+                <button class="nav-btn btn-next" onclick="turnPage(1, true)">Open ➔</button>
+            </div>
+            <div class="back">
+                <div class="page-half">
+                    <img src="pic2.jpeg" class="scrap-img img-landscape" style="--rot: 3deg;" alt="صورة 2">
+                </div>
+                <div class="page-half">
+                    <div class="aesthetic-text" style="font-size: 2.2rem;">Our Story Begins 📖</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الغلاف الخلفي الثابت (شمال) -->
+        <div class="page left-side" style="z-index: 0;">
+            <div class="front" style="justify-content: center; align-items: center;">
+                <div style="font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--text-dark); font-style: italic; text-align: center;">
+                    Best Friends Forever ✨
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        const totalPages = 5; 
+
+        function turnPage(pageNum, isForward) {
+            const pageElement = document.getElementById(`page${pageNum}`);
+            if(!pageElement) return;
+            
+            if (isForward) {
+                pageElement.classList.add('flipped');
+                setTimeout(() => { 
+                    pageElement.style.zIndex = pageNum; 
+                }, 600); 
+            } else {
+                pageElement.classList.remove('flipped');
+                setTimeout(() => { 
+                    pageElement.style.zIndex = totalPages - pageNum + 1; 
+                }, 600);
+            }
+        }
+
+        function toggleMusic() {
+            const audio = document.getElementById('bgMusic');
+            const btn = document.getElementById('music-btn');
+            if (audio.paused) {
+                audio.play(); 
+                btn.innerHTML = '⏸️ Pause Music';
+            } else {
+                audio.pause(); 
+                btn.innerHTML = '🎵 Play Music';
+            }
+        }
+    </script>
+</body>
+</html>
